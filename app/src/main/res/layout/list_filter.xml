@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/search_view"
+    android:layout_width="fill_parent"
+    android:layout_height="58.0dip"
+    android:background="@color/White_Azure" >
+
+    <EditText
+        android:id="@+id/search_field"
+        android:layout_width="fill_parent"
+        android:layout_height="37.0dip"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="5dip"
+        android:layout_marginRight="5dip"
+        android:imeOptions="actionSearch"
+        android:paddingBottom="3.0dip"
+        android:paddingTop="3.0dip"
+         android:background="@color/Green"
+        android:singleLine="true"
+        android:textSize="16.0sp"
+        tools:ignore="TextFields" />
+
+    <FrameLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:clipChildren="true" >
+
+        <LinearLayout
+            android:id="@+id/background_view"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:background="@color/White_Azure"
+            android:gravity="right"
+            android:orientation="horizontal" >
+
+            <ImageButton
+                android:id="@+id/collapse_expand_button"
+                android:layout_width="20dip"
+                android:layout_height="fill_parent"
+                android:background="@null"
+                android:src="@drawable/left_arrow" />
+
+            <RadioGroup
+                android:id="@+id/selector_radiogroup"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:orientation="horizontal" >
+
+                <RadioButton
+                    android:id="@+id/subject_button"
+                    android:layout_width="0.0dip"
+                    android:layout_height="fill_parent"
+                    android:background="@drawable/custom_filter_button_selector"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:text="Title"
+                    android:textColor="@color/White_Azure"
+                    android:textSize="12.0sp"
+                    tools:ignore="HardcodedText" />
+
+                <RadioButton
+                    android:id="@+id/TO_button"
+                    android:layout_width="0.0dip"
+                    android:layout_height="fill_parent"
+                    android:background="@drawable/custom_filter_button_selector"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:text="TO"
+                    android:textColor="@color/White_Azure"
+                    android:textSize="12.0sp" />
+
+                <RadioButton
+                    android:id="@+id/FROM_button"
+                    android:layout_width="0.0dip"
+                    android:layout_height="fill_parent"
+                    android:background="@drawable/custom_filter_button_selector"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:text="From"
+                    android:textColor="@color/White_Azure"
+                    android:textSize="12.0sp" />
+            </RadioGroup>
+        </LinearLayout>
+
+        <View
+            android:id="@+id/clipping_mask"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:background="@drawable/custom_selector_clip_mask" />
+    </FrameLayout>
+
+</RelativeLayout>

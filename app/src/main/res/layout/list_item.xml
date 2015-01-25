@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:descendantFocusability="blocksDescendants">
+    <TextView
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:gravity="center_vertical"
+        android:textColor="@android:color/white"
+        android:background="@color/list_bg"
+        android:text="@string/list_item_background"
+        android:layout_width="match_parent"
+        android:id="@+id/swipeBackgroundView"
+        android:layout_height="match_parent" />
+  <!--   <FrameLayout android:id="@+id/swiping_layout"
+        android:background="@android:color/white"
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"> -->
+        
+        <RelativeLayout 
+		    android:layout_width="fill_parent"
+		    android:id="@+id/swiping_layout"
+        	android:background="@android:color/white"
+		    android:layout_height="wrap_content"
+		    android:orientation="horizontal"
+		    android:padding="5dip" >
+
+			<!--  ListRow Left sied Thumbnail image -->
+			<LinearLayout android:id="@+id/thumbnail" 
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:padding="3dip"		
+		        android:layout_alignParentLeft="true"
+		        android:background="@drawable/image_bg" 
+			    android:layout_marginRight="5dip">
+		        
+				<ImageView     
+					android:id="@+id/file_type"   
+			        android:layout_width="35dip"
+			        android:layout_height="35dip"/>
+		        
+			</LinearLayout>
+		    
+			
+		    <TextView
+		        android:id="@+id/senderName"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_alignTop="@+id/thumbnail"
+		        android:layout_toRightOf="@+id/thumbnail"
+		        android:textColor="#040404"
+		        android:typeface="sans" 
+		        android:textSize="15dip"
+		        android:textStyle="bold"/>
+		
+			<!-- File Name -->
+		    <TextView
+		        android:id="@+id/fileName"
+		        android:layout_width="fill_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_below="@id/senderName"
+		        android:textColor="#343434"
+		        android:textSize="10dip"
+		        android:layout_marginTop="1dip"
+		        android:layout_toRightOf="@+id/thumbnail" />
+		
+			<!-- Date -->
+		    <TextView
+		        android:id="@+id/date"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_alignParentRight="true"
+		        android:layout_alignTop="@id/senderName"
+		        android:gravity="right"
+		        android:layout_marginRight="5dip"
+		        android:layout_marginBottom="5dp"
+		        android:textSize="10dip"
+		        android:textStyle="bold"/>
+		      
+		     <!-- Tagged -->    
+		     <ImageView 
+		        android:id="@+id/tag"
+		     	android:src="@drawable/ic_tagged"
+		     	android:layout_width="30dip"
+			    android:layout_height="30dip"
+			    android:layout_marginRight="5dp"
+			    android:paddingBottom="5dp"
+			    android:layout_below="@+id/date"
+			    android:background="@drawable/tag_selector"
+			    android:clickable="true"
+		     	android:layout_alignParentRight="true"
+		     	android:layout_centerHorizontal="true"
+		     	/>
+		
+		</RelativeLayout>
+   <!-- </FrameLayout>  --> 
+</FrameLayout>

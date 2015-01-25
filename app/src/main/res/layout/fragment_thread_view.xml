@@ -1,0 +1,24 @@
+<LinearLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="match_parent"
+    tools:context="com.example.myswipelist.ThreadViewFragment" >
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="This is Thread view..." />
+    
+    <Button android:id="@+id/threadBack"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Back" />
+
+    <WebView
+        android:id="@+id/emailView"
+        android:layout_width="fill_parent" android:layout_height="wrap_content" />
+    
+</LinearLayout>
