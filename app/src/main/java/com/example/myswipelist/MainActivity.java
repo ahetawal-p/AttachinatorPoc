@@ -3,7 +3,6 @@ package com.example.myswipelist;
 import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
@@ -22,14 +21,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.AbsListView;
-import android.widget.AbsListView.OnScrollListener;
 import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.myswipelist.MyEnhancedListView.SwipeDirection;
 import com.example.myswiplelist.data.AttachmentModel;
 import com.example.myswiplelist.util.DummyDataUtil;
 
@@ -40,7 +36,7 @@ public class MainActivity extends ActionBarActivity implements  SwipeRefreshLayo
 												MyEnhancedListView.ViewRotationCallback, BaseViewFragment.OnFragmentInteractionListener {
 
 	//private MyListAdapter mAdapter;
-    private MyEnhancedListView mListView;
+    //private MyEnhancedListView mListView;
  	private ViewGroup mContainer;
  	private ViewGroup contentViewContainer;
 	private Animation animation1;
@@ -62,16 +58,16 @@ public class MainActivity extends ActionBarActivity implements  SwipeRefreshLayo
     	super.onCreate(savedInstanceState);
     	setContentView(R.layout.activity_main);
 
-//    	swipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
-//        swipeLayout.setOnRefreshListener(this);
-//        swipeLayout.setColorScheme(android.R.color.holo_blue_bright,
-//                android.R.color.holo_green_light,
-//                android.R.color.holo_orange_light,
-//                android.R.color.holo_red_light);
+    	swipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
+        swipeLayout.setOnRefreshListener(this);
+        swipeLayout.setColorScheme(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
         
     	fragmentManager = getFragmentManager();
     	
-    	//contentViewContainer = (ViewGroup) findViewById(R.id.contentViewContainer);
+    	contentViewContainer = (ViewGroup) findViewById(R.id.contentViewContainer);
 //    	mListView = (MyEnhancedListView)findViewById(R.id.list);
 
 //    	mAdapter = new MyListAdapter(this);
@@ -137,21 +133,25 @@ public class MainActivity extends ActionBarActivity implements  SwipeRefreshLayo
 
                             @Override
                             public void onDismiss(RecyclerView recyclerView, int[] reverseSortedPositions, ActionType actionType) {
-                                //Display action type via dialog for now
-                                displayAlert(actionType);
+                                if (actionType == ActionType.VIEW_THREAD){
+                                    int swipedItemPosition = reverseSortedPositions[0];
+                                    doListRotation(swipedItemPosition, true);
+                                }else {
+                                    displayAlert(actionType);
+                                }
 
                                 /* commenting out item removal part. this was originally used for swipe to dismiss */
-//                                for (int position : reverseSortedPositions) {
-//                                    mItems.remove(position);
-//                                }
-//                                // do not call notifyItemRemoved for every item, it will cause gaps on deleting items
-//                                mAdapter.notifyDataSetChanged();
+                                for (int position : reverseSortedPositions) {
+                                    mItems.remove(position);
+                                    mAdapter.notifyDataSetChanged();
+                                }
+                                // do not call notifyItemRemoved for every item, it will cause gaps on deleting items
                             }
                         });
         mRecyclerView.setOnTouchListener(touchListener);
         // Setting this scroll listener is required to ensure that during ListView scrolling,
         // we don't look for swipes.
-        mRecyclerView.setOnScrollListener(touchListener.makeScrollListener());
+        //mRecyclerView.setOnScrollListener(touchListener.makeScrollListener());
         mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this,
                 new OnItemClickListener() {
                     @Override
@@ -162,25 +162,25 @@ public class MainActivity extends ActionBarActivity implements  SwipeRefreshLayo
 //    	mListView.enableSwipeToDismiss();
 //    	 mListView.setSwipeRefresh(swipeLayout);
 //    	 mListView.setSwipeDirection(SwipeDirection.BOTH);
-//
-//    	 mListView.setOnScrollListener(new OnScrollListener() {
-//
-//    		 @Override
-//    		 public void onScrollStateChanged(AbsListView view, int scrollState) {
-//    		 }
-//
-//    		 @Override
-//    		 public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-//
-//    	            int position = firstVisibleItem+visibleItemCount;
-//    	            int limit = 10;
-//    	            int totalItems = 20;
-//    	            if(position>limit && totalItemCount>0 && !swipeLayout.isRefreshing() && position <totalItems){
-//    	            	swipeLayout.setRefreshing(true);
-//    	                onRefresh();
-//    	            }
-//    	        }
-//    	    });
+
+        mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+
+    		 @Override
+    		 public void onScrollStateChanged(RecyclerView view, int scrollState) {
+    		 }
+
+    		 @Override
+    		 public void onScrolled(RecyclerView recyclerview, int i, int j) {
+
+    	            int position = i+j;
+    	            int limit = 10;
+    	            int totalItems = 20;
+    	            if(position>limit && !swipeLayout.isRefreshing() && position <totalItems){
+    	            	swipeLayout.setRefreshing(true);
+    	                onRefresh();
+    	            }
+    	        }
+    	    });
 //
 //         // Enable or disable swiping layout feature
 //         mListView.setSwipingLayout(R.id.swiping_layout);
@@ -188,12 +188,12 @@ public class MainActivity extends ActionBarActivity implements  SwipeRefreshLayo
 //
 //         mListView.setViewRotationCallback(this);
 
-//         mContainer = (ViewGroup) findViewById(R.id.container);
+         mContainer = (ViewGroup) findViewById(R.id.container);
 //         // Since we are caching large views, we want to keep their cache
 // 		// between each animation
-// 		mContainer.setPersistentDrawingCache(ViewGroup.PERSISTENT_ANIMATION_CACHE);
-// 		animation1 = AnimationUtils.loadAnimation(this, R.anim.to_middle);
-//		animation2 = AnimationUtils.loadAnimation(this, R.anim.from_middle);
+		mContainer.setPersistentDrawingCache(ViewGroup.PERSISTENT_ANIMATION_CACHE);
+		animation1 = AnimationUtils.loadAnimation(this, R.anim.to_middle);
+		animation2 = AnimationUtils.loadAnimation(this, R.anim.from_middle);
 		
     }
 
@@ -254,53 +254,24 @@ public class MainActivity extends ActionBarActivity implements  SwipeRefreshLayo
 	@Override
 	public void doListRotation(int position, boolean toRightSide) {
 		FragmentTransaction transaction = fragmentManager.beginTransaction();
-//		AttachmentModel modelObject = (AttachmentModel)mAdapter.getItem(position);
-//
-//		if(toRightSide){
-//			ThreadViewFragment threadFragment = ThreadViewFragment.newInstance(modelObject.getEmailContent());
-//			transaction.replace(R.id.contentViewContainer, threadFragment);
-//		}else {
-//			transaction.replace(R.id.contentViewContainer, new MessageViewFragment());
-//		}
-//
-//		transaction.commit();
-//		applyNewRotation(position, toRightSide);
-	}
+		AttachmentModel modelObject = (AttachmentModel)(mItems.get(position));
 
-    @Override
-    public void doListRotation(int position, boolean toRightSide, boolean isFullSwipe) {
-//        FragmentTransaction transaction = fragmentManager.beginTransaction();
-//        AttachmentModel modelObject = (AttachmentModel)mAdapter.getItem(position);
-//
-//        if(toRightSide){
-//            ThreadViewFragment threadFragment = ThreadViewFragment.newInstance(modelObject.getEmailContent());
-//            transaction.replace(R.id.contentViewContainer, threadFragment);
-//        }else {
-//            transaction.replace(R.id.contentViewContainer, new MessageViewFragment());
-//            AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-//            alertDialog.setTitle("Half Swipe");
-//            alertDialog.setMessage("Half");
-//
-//            if (isFullSwipe){
-//                alertDialog.setTitle("Full Swipe");
-//                alertDialog.setMessage("Full");
-//            }
-//
-//            alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
-//                public void onClick(DialogInterface dialog, int which) {
-//                }
-//            });
-//            alertDialog.show();
-//        }
-//
-//        transaction.commit();
-//        applyNewRotation(position, toRightSide);
-    }
+		if(toRightSide){
+			ThreadViewFragment threadFragment = ThreadViewFragment.newInstance(modelObject.getEmailContent());
+			transaction.replace(R.id.contentViewContainer, threadFragment);
+		}else {
+			transaction.replace(R.id.contentViewContainer, new MessageViewFragment());
+		}
+
+		transaction.commit();
+		applyNewRotation(position, toRightSide);
+	}
 
     /* Originally in MyListAdapter */
     private void resetItems() {
         mItems.clear();
         mItems.addAll(DummyDataUtil.prepareData());
+
     }
 
     private int detectType(AttachmentModel.ATTACHMENT_TYPE attchType) {
@@ -400,12 +371,15 @@ public class MainActivity extends ActionBarActivity implements  SwipeRefreshLayo
 		
 				// case when Listview is clicked
 				if(mPosition > -1 ){
-					mListView.setVisibility(View.GONE);
+                    mRecyclerView.setVisibility(View.GONE);
+					//mListView.setVisibility(View.GONE);
 					contentViewContainer.setVisibility(View.VISIBLE);
 				}else {
 					// case when fragment is clicked
-					mListView.setVisibility(View.VISIBLE);
-					mListView.requestFocus();
+//					mListView.setVisibility(View.VISIBLE);
+//					mListView.requestFocus();
+                    mRecyclerView.setVisibility(View.VISIBLE);
+                    mRecyclerView.requestFocus();
 					contentViewContainer.setVisibility(View.GONE);
 				}
 				mContainer.setAnimation(animation2);
@@ -427,9 +401,11 @@ public class MainActivity extends ActionBarActivity implements  SwipeRefreshLayo
 	public void onRefresh() {
 		new Handler().postDelayed(new Runnable() {
 	        @Override public void run() {
-	            swipeLayout.setRefreshing(false);
+                resetItems();
+                mAdapter.notifyDataSetChanged();
+                swipeLayout.setRefreshing(false);
 	        }
-	    }, 3000);
+	    }, 2000);
 		
 	}
 

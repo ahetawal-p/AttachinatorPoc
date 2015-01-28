@@ -117,7 +117,7 @@ public enum SwipeDirection {
      * If the user should get the possibility to swipe the item, return true.
      * Otherwise, return false to disable swiping for this item.
      *
-     * @param listView The {@link EnhancedListView} the item is wiping from.
+     * @param listView The {@link MyEnhancedListView} the item is wiping from.
      * @param position The position of the item to swipe in your adapter.
      * @return Whether the item should be swiped or not.
      */
@@ -127,7 +127,6 @@ public enum SwipeDirection {
 
 	public interface ViewRotationCallback {
 		void doListRotation(int position, boolean toRightSide);
-		void doListRotation(int position, boolean toRightSide, boolean isFullSwipe);
 	}
 
  public MyEnhancedListView(Context context) {
@@ -216,7 +215,6 @@ public enum SwipeDirection {
     
     /**
      * Slide out a view to the right or left of the list. After the animation has finished, the
-     * view will be dismissed by calling {@link #performDismiss(android.view.View, android.view.View, int)}.
      *
      * @param view The view, that should be slided out.
      * @param childView The whole view of the list item.
@@ -233,7 +231,7 @@ public enum SwipeDirection {
             mAnimatedViews.add(view);
         }
         
-        mRotationCallback.doListRotation(position, toRightSide, isFullSwipe);
+        mRotationCallback.doListRotation(position, toRightSide);
         mAnimatedViews.remove(view);
     }
     

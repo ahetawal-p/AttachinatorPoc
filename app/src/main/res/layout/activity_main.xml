@@ -12,32 +12,23 @@
     android:id="@+id/container"
     tools:context="com.example.myswipelist.MainActivity" >
 
-    <!--<android.support.v4.widget.SwipeRefreshLayout-->
-    <!--android:id="@+id/swipe_container"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent">-->
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerView"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_container"
         android:layout_width="match_parent"
-        android:clickable="false"
-        android:layout_height="match_parent"/>
-    <!--<com.example.myswipelist.MyEnhancedListView-->
-        <!--android:id="@+id/list"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:persistentDrawingCache="animation|scrolling"-->
-        <!--android:listSelector="@null"-->
-        <!--android:clickable="false"-->
-        <!--android:layout_height="match_parent"/>-->
-	
-    <!--</android.support.v4.widget.SwipeRefreshLayout>-->
+        android:layout_height="match_parent">
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:clickable="false"
+            android:layout_height="match_parent"/>
+    </android.support.v4.widget.SwipeRefreshLayout>
     
-    <!--<FrameLayout-->
-        <!--android:id="@+id/contentViewContainer"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:visibility="gone"-->
-         <!--/>-->
+    <FrameLayout
+        android:id="@+id/contentViewContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+         />
       
 </FrameLayout>
 <!--</LinearLayout>-->

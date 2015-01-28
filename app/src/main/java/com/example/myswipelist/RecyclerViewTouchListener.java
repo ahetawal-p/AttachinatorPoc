@@ -223,9 +223,9 @@ public class RecyclerViewTouchListener implements View.OnTouchListener {
                     break;
                 }
 
-                if (mDownView != null && mSwiping) {
+                if (swipeLayoutView != null && mSwiping) {
                     // cancel
-                    mDownView.animate()
+                    swipeLayoutView.animate()
                             .translationX(0)
                             .alpha(1)
                             .setDuration(mAnimationTime)
@@ -280,7 +280,7 @@ public class RecyclerViewTouchListener implements View.OnTouchListener {
                             .setListener(new AnimatorListenerAdapter() {
                                 @Override
                                 public void onAnimationEnd(Animator animation) {
-                                    //performDismiss(swipeView, downPosition, finalActionType);
+                                    performDismiss(swipeView, downPosition, finalActionType);
                                 }
                             });
                 } else {
@@ -310,19 +310,20 @@ public class RecyclerViewTouchListener implements View.OnTouchListener {
                 mVelocityTracker.addMovement(motionEvent);
                 float deltaX = motionEvent.getRawX() - mDownX;
                 float deltaY = motionEvent.getRawY() - mDownY;
-                if (Math.abs(deltaX) > mSlop && Math.abs(deltaY) < Math.abs(deltaX) / 2) {
+                if (Math.abs(deltaX) > mSlop
+                        && Math.abs(deltaY) < Math.abs(deltaX)/ 2
+                        ) {
                     mSwiping = true;
                     mSwipingSlop = (deltaX > 0 ? mSlop : -mSlop);
                     mRecyclerView.requestDisallowInterceptTouchEvent(true);
-
-                    // Cancel ListView's touch (un-highlighting the item)
-                    MotionEvent cancelEvent = MotionEvent.obtain(motionEvent);
-                    cancelEvent.setAction(MotionEvent.ACTION_CANCEL |
-                            (motionEvent.getActionIndex()
-                                    << MotionEvent.ACTION_POINTER_INDEX_SHIFT));
-                    mRecyclerView.onTouchEvent(cancelEvent);
-                    cancelEvent.recycle();
                 }
+                // Cancel ListView's touch (un-highlighting the item)
+                MotionEvent cancelEvent = MotionEvent.obtain(motionEvent);
+                cancelEvent.setAction(MotionEvent.ACTION_CANCEL |
+                        (motionEvent.getActionIndex()
+                                << MotionEvent.ACTION_POINTER_INDEX_SHIFT));
+                mRecyclerView.onTouchEvent(cancelEvent);
+                cancelEvent.recycle();
 
                 changeSwipeBackgroundView(swipeBackgroundView, deltaX, mSwiping);
 
