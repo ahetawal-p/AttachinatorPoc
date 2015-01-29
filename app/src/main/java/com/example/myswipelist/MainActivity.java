@@ -1,10 +1,12 @@
 package com.example.myswipelist;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,20 +16,22 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.GestureDetector;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.ImageView;
+import android.widget.AdapterView;
+import android.widget.GridView;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.myswiplelist.data.AttachmentModel;
+import com.example.myswiplelist.util.DeferDialogUtil;
 import com.example.myswiplelist.util.DummyDataUtil;
 
 import java.util.ArrayList;
@@ -53,6 +57,7 @@ public class MainActivity extends ActionBarActivity implements  SwipeRefreshLayo
     private RecyclerViewAdapter mAdapter;
     private List<AttachmentModel> mItems = new ArrayList<AttachmentModel>();
     private Drawable tagged;
+    private DeferDialogUtil deferDialogUtil;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +72,7 @@ public class MainActivity extends ActionBarActivity implements  SwipeRefreshLayo
                 android.R.color.holo_red_light);
         
     	fragmentManager = getFragmentManager();
-    	
+        deferDialogUtil = new DeferDialogUtil();
     	contentViewContainer = (ViewGroup) findViewById(R.id.contentViewContainer);
     	resetItems();
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
@@ -97,7 +102,10 @@ public class MainActivity extends ActionBarActivity implements  SwipeRefreshLayo
                                 if (actionType == ActionType.VIEW_THREAD){
                                     int swipedItemPosition = reverseSortedPositions[0];
                                     doListRotation(swipedItemPosition, true);
-                                }else {
+                                }else if (actionType == ActionType.DEFER){
+                                    openDeferDialog();
+                                }
+                                else {
                                     displayAlert(actionType);
                                 }
 
@@ -114,7 +122,7 @@ public class MainActivity extends ActionBarActivity implements  SwipeRefreshLayo
         // we don't look for swipes.
         //mRecyclerView.setOnScrollListener(touchListener.makeScrollListener());
         mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this,
-                new OnItemClickListener() {
+                new OnRecyclerItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
                         Toast.makeText(MainActivity.this, "Clicked " + mItems.get(position), Toast.LENGTH_SHORT).show();
@@ -176,6 +184,29 @@ public class MainActivity extends ActionBarActivity implements  SwipeRefreshLayo
 		
     }
 
+    private void openDeferDialog(){
+        // custom dialog
+        final Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.defer_dialog);
+        GridView gridView = (GridView) dialog.findViewById(R.id.deferGridView);
+        gridView.setAdapter(new DeferDialogAdapter(this, deferDialogUtil.getDeferDialogItems()));
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View v,
+                                    int position, long id) {
+
+                String label = ((TextView) v.findViewById(R.id.grid_item_label)).getText().toString();
+                if (!label.isEmpty())
+                    Toast.makeText(
+                            getApplicationContext(),
+                            label, Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+
+            }
+        });
+
+        dialog.show();
+    }
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -235,16 +266,16 @@ public class MainActivity extends ActionBarActivity implements  SwipeRefreshLayo
 
     }
 
-    public interface OnItemClickListener {
+    public interface OnRecyclerItemClickListener {
         public void onItemClick(View view, int position);
     }
 
     public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListener {
-        private OnItemClickListener mListener;
+        private OnRecyclerItemClickListener mListener;
 
         GestureDetector mGestureDetector;
 
-        public RecyclerItemClickListener(Context context, OnItemClickListener listener) {
+        public RecyclerItemClickListener(Context context, OnRecyclerItemClickListener listener) {
             mListener = listener;
             mGestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
                 @Override
