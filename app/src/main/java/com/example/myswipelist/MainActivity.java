@@ -12,6 +12,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v4.widget.*;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -47,11 +48,11 @@ public class MainActivity extends ActionBarActivity implements  SwipeRefreshLayo
 
     /* RecyclerView items */
     private RecyclerView mRecyclerView;
-    private RecyclerView.LayoutManager mLayoutManager;
-    private RecyclerView.Adapter<CustomViewHolder> mAdapter;
+    //private RecyclerView.LayoutManager mLayoutManager;
+    private LinearLayoutManager mLayoutManager;
+    private RecyclerViewAdapter mAdapter;
     private List<AttachmentModel> mItems = new ArrayList<AttachmentModel>();
     private Drawable tagged;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,54 +69,14 @@ public class MainActivity extends ActionBarActivity implements  SwipeRefreshLayo
     	fragmentManager = getFragmentManager();
     	
     	contentViewContainer = (ViewGroup) findViewById(R.id.contentViewContainer);
-//    	mListView = (MyEnhancedListView)findViewById(R.id.list);
-
-//    	mAdapter = new MyListAdapter(this);
     	resetItems();
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
 
         tagged = getResources().getDrawable(R.drawable.tagged_bg);
         mLayoutManager = new LinearLayoutManager(this);
-//        mLayoutManager = new GridLayoutManager(this, 2);
-//        mLayoutManager = new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(mLayoutManager);
 //
-//    	mListView.setAdapter(mAdapter);
-
-        /* new implementation of mAdapter */
-        mAdapter = new RecyclerView.Adapter<CustomViewHolder>() {
-            @Override
-            public CustomViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-                View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.list_item
-                        , viewGroup, false);
-                return new CustomViewHolder(view);
-            }
-
-            @Override
-            public void onBindViewHolder(CustomViewHolder viewHolder, int i) {
-                viewHolder.position = i;
-                viewHolder.senderName.setText(mItems.get(i).getSenderName());
-                viewHolder.fileName.setText(mItems.get(i).getAttchFileName());
-                viewHolder.date.setText(mItems.get(i).getDate());
-                viewHolder.file_type.setImageResource(detectType(mItems.get(i).getAttchType()));
-                if(mItems.get(i).getTagName() != ""){
-                    //viewHolder.tag.setBackground(tagged);
-                }
-            }
-
-            @Override
-            public int getItemCount() {
-                int size = mItems.size();
-                try {
-                    return size;
-                }
-                catch (Exception ex){
-                    String asdf = ex.toString();
-                    return 1;
-                }
-            }
-        };
-        /* end */
+        mAdapter = new RecyclerViewAdapter((ArrayList)mItems);
         try {
             mRecyclerView.setAdapter(mAdapter);
         }
@@ -142,7 +103,7 @@ public class MainActivity extends ActionBarActivity implements  SwipeRefreshLayo
 
                                 /* commenting out item removal part. this was originally used for swipe to dismiss */
                                 for (int position : reverseSortedPositions) {
-                                    mItems.remove(position);
+                                    mAdapter.remove(position);
                                     mAdapter.notifyDataSetChanged();
                                 }
                                 // do not call notifyItemRemoved for every item, it will cause gaps on deleting items
@@ -169,16 +130,34 @@ public class MainActivity extends ActionBarActivity implements  SwipeRefreshLayo
     		 public void onScrollStateChanged(RecyclerView view, int scrollState) {
     		 }
 
+             private int previousTotal = 0;
+             private boolean loading = true;
+             private int visibleThreshold = 5;
+             int firstVisibleItem, visibleItemCount, totalItemCount;
     		 @Override
-    		 public void onScrolled(RecyclerView recyclerview, int i, int j) {
+    		 public void onScrolled(RecyclerView recyclerview, int dx, int dy) {
+                 super.onScrolled(recyclerview, dx, dy);
 
-    	            int position = i+j;
-    	            int limit = 10;
-    	            int totalItems = 20;
-    	            if(position>limit && !swipeLayout.isRefreshing() && position <totalItems){
-    	            	swipeLayout.setRefreshing(true);
-    	                onRefresh();
-    	            }
+                 visibleItemCount = mRecyclerView.getChildCount();
+                 totalItemCount = mLayoutManager.getItemCount();
+                 firstVisibleItem = mLayoutManager.findFirstVisibleItemPosition();
+
+                 if (loading) {
+                     if (totalItemCount > previousTotal) {
+                         loading = false;
+                         previousTotal = totalItemCount;
+                     }
+                 }
+                 if (!loading && (totalItemCount - visibleItemCount)
+                         <= (firstVisibleItem + visibleThreshold)) {
+                     // End has been reached
+                     Log.i("...", "end called");
+
+                     // Do something
+                     swipeLayout.setRefreshing(true);
+                     onRefresh();
+                     loading = true;
+                 }
     	        }
     	    });
 //
@@ -197,24 +176,6 @@ public class MainActivity extends ActionBarActivity implements  SwipeRefreshLayo
 		
     }
 
-    private class CustomViewHolder extends RecyclerView.ViewHolder {
-        private TextView senderName;
-        private TextView fileName;
-        private TextView date;
-        private ImageView file_type;
-        private ImageView tag;
-        private int position;
-
-        public CustomViewHolder(View itemView) {
-            super(itemView);
-
-            senderName = (TextView) itemView.findViewById(R.id.senderName);
-            fileName = (TextView) itemView.findViewById(R.id.fileName);
-            date = (TextView) itemView.findViewById(R.id.date);
-            file_type = (ImageView) itemView.findViewById(R.id.file_type);
-            senderName = (TextView) itemView.findViewById(R.id.senderName);
-        }
-    }
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -274,51 +235,6 @@ public class MainActivity extends ActionBarActivity implements  SwipeRefreshLayo
 
     }
 
-    private int detectType(AttachmentModel.ATTACHMENT_TYPE attchType) {
-        int id = R.drawable.no_image;
-
-        switch (attchType) {
-            case ARCHIVE :
-                id = R.drawable.file_type_archive;
-                break;
-            case AUDIO :
-                id = R.drawable.file_type_audio;
-                break;
-            case DOC :
-                id = R.drawable.file_type_doc;
-                break;
-            case DRAWING :
-                id = R.drawable.file_type_drawing;
-                break;
-            case EXCEL :
-                id = R.drawable.file_type_excel;
-                break;
-            case TEXT :
-                id = R.drawable.file_type_file;
-                break;
-            case IMAGE :
-                id = R.drawable.file_type_image;
-                break;
-            case PDF :
-                id = R.drawable.file_type_pdf;
-                break;
-            case POWERPOINT :
-                id = R.drawable.file_type_powerpoint;
-                break;
-            case VIDEO :
-                id = R.drawable.file_type_video;
-                break;
-            case WORD :
-                id = R.drawable.file_type_word;
-                break;
-            default :
-                id = R.drawable.file_type_fusion;
-
-        }
-        return id;
-
-    }
-
     public interface OnItemClickListener {
         public void onItemClick(View view, int position);
     }
@@ -368,16 +284,12 @@ public class MainActivity extends ActionBarActivity implements  SwipeRefreshLayo
 		}
 
 		public void onAnimationEnd(Animation animation) {
-		
 				// case when Listview is clicked
 				if(mPosition > -1 ){
                     mRecyclerView.setVisibility(View.GONE);
-					//mListView.setVisibility(View.GONE);
 					contentViewContainer.setVisibility(View.VISIBLE);
 				}else {
 					// case when fragment is clicked
-//					mListView.setVisibility(View.VISIBLE);
-//					mListView.requestFocus();
                     mRecyclerView.setVisibility(View.VISIBLE);
                     mRecyclerView.requestFocus();
 					contentViewContainer.setVisibility(View.GONE);
