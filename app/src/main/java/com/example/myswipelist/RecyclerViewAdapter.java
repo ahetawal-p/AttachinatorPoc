@@ -18,8 +18,10 @@ import java.util.List;
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.CustomViewHolder>{
 
     private List<AttachmentModel> mItems;
-    public RecyclerViewAdapter(ArrayList<AttachmentModel> mItems) {
+    private ClickTagCallback callback;
+    public RecyclerViewAdapter(ArrayList<AttachmentModel> mItems, ClickTagCallback callback) {
         this.mItems = mItems;
+        this.callback = callback;
     }
 
 
@@ -27,7 +29,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public CustomViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.list_item
                 , viewGroup, false);
-        return new CustomViewHolder(view);
+        return new CustomViewHolder(view, callback);
     }
 
     @Override
@@ -40,6 +42,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         if(mItems.get(i).getTagName() != ""){
             //viewHolder.tag.setBackground(tagged);
         }
+    }
+
+    public interface ClickTagCallback {
+        void onClickTag();
     }
 
     @Override
@@ -104,15 +110,16 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     }
 
-    public static class CustomViewHolder extends RecyclerView.ViewHolder {
+    public static class CustomViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TextView senderName;
         private TextView fileName;
         private TextView date;
         private ImageView file_type;
         private ImageView tag;
         private int position;
+        private ClickTagCallback callback;
 
-        public CustomViewHolder(View itemView) {
+        public CustomViewHolder(View itemView, ClickTagCallback callback) {
             super(itemView);
 
             senderName = (TextView) itemView.findViewById(R.id.senderName);
@@ -120,8 +127,18 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             date = (TextView) itemView.findViewById(R.id.date);
             file_type = (ImageView) itemView.findViewById(R.id.file_type);
             senderName = (TextView) itemView.findViewById(R.id.senderName);
+            tag = (ImageView) itemView.findViewById(R.id.tag);
+            tag.setOnClickListener(this);
+            this.callback = callback;
+        }
+
+        @Override
+        public void onClick(View v) {
+            callback.onClickTag();
         }
     }
+
+
 
 }
 
