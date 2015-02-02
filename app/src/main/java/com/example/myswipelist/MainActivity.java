@@ -49,7 +49,6 @@ import org.apmem.tools.layouts.FlowLayout;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 
 public class MainActivity extends ActionBarActivity implements  SwipeRefreshLayout.OnRefreshListener, SearchView.OnQueryTextListener, SearchView.OnCloseListener,
@@ -98,9 +97,7 @@ public class MainActivity extends ActionBarActivity implements  SwipeRefreshLayo
 //
         mAdapter = new RecyclerViewAdapter((ArrayList)mItems, new RecyclerViewAdapter.ClickTagCallback() {
             @Override
-            public void onClickTag() {
-                openTagDialog();
-            }
+            public void onClickTag() {}
         });
         try {
             mRecyclerView.setAdapter(mAdapter);
@@ -249,7 +246,7 @@ public class MainActivity extends ActionBarActivity implements  SwipeRefreshLayo
 
                 // TODO Auto-generated method stub
                 String selectedRecentTag = (String) parent.getItemAtPosition(position);
-//                TextView tv = createContactTextView(selectedRecentTag);
+//                TextView tv = createTagTextView(selectedRecentTag);
                 appendToInputTextView(selectedRecentTag, sb, tagInputTextView);
             }
         });
@@ -306,7 +303,7 @@ public class MainActivity extends ActionBarActivity implements  SwipeRefreshLayo
     }
 
     private void appendToInputTextView(String selectedRecentTag, SpannableStringBuilder sb, MultiAutoCompleteTextView tagInputTextView) {
-        View tv = createContactTextView(selectedRecentTag);
+        View tv = createTagTextView(selectedRecentTag);
 
         BitmapDrawable bd = (BitmapDrawable) convertViewToDrawable(tv);
         bd.setBounds(0, 0, tv.getWidth(),
@@ -332,7 +329,7 @@ public class MainActivity extends ActionBarActivity implements  SwipeRefreshLayo
         inputTextView.setText(inputTextString);
     }
 
-    public View createContactTextView(String text) {
+    public View createTagTextView(String text) {
         LayoutInflater inflater =
                 (LayoutInflater)this.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
         View recentTagParent = inflater.inflate( R.layout.tag_dialog_item, null );
@@ -369,6 +366,7 @@ public class MainActivity extends ActionBarActivity implements  SwipeRefreshLayo
 
     public static Object convertViewToDrawable(View view) {
         int spec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+        view.setLayoutParams(new ViewGroup.LayoutParams(0,0));
         view.measure(spec, spec);
         view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
 
