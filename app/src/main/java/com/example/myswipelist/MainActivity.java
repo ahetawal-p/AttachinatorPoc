@@ -316,6 +316,7 @@ public class MainActivity extends ActionBarActivity implements  SwipeRefreshLayo
         sb.setSpan(new ImageSpan(bd),
                 sb.length() - selectedRecentTag.length()-2, sb.length()-2,
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
         tagInputTextView.setText("");
         tagInputTextView.setText(sb);
         int length = sb.length();
